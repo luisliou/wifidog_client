@@ -1,0 +1,110 @@
+body {
+  background-image: url("backgrd.jpg");;
+  background-size: 100%;
+  background-repeat: repeat-y;
+}
+
+#login_frame {
+  width: 80%;
+  height: 100%;
+  padding: 0%;
+
+  position: top;
+  left: 60%;
+  top: 10%;
+
+  margin-left: 10%;
+  margin-top: 10%;
+
+  background-color: rgba(46, 206, 219, 0.71);
+
+  border-radius: 10px;
+  text-align: center;
+}
+
+#image_logo {
+  padding-top:5%
+}
+
+.text_field {
+  width: 40%;
+  margin-top: 0%;
+  border-radius: 4px;
+  border: 0;
+}
+
+#btn_login {
+  width: 80%;
+  line-height: 200%;
+  text-align: center;
+
+  color: white;
+  background-color: #3BD9FF;
+  border-radius: 6px;
+  border: 0;
+  margin-bottom: 10%;
+
+  float: center;
+}
+
+#forget_pwd {
+  font-size: 12px;
+  color: white;
+  text-decoration: none;
+  position: relative;
+  float: right;
+  top: 5px;
+
+}
+
+#forget_pwd:hover {
+  color: blue;
+  text-decoration: underline;
+}
+
+#login_control {
+  padding: 32%;
+}
+
+.label_input {
+  width: 30%;
+  line-height: 160%;
+  text-align: center;
+
+  color: white;
+  background-color: #00ceff;
+  border-radius: 0px;
+  border: 0;
+  margin-left: 10%;
+
+  float: left;
+}
+
+.label_title {
+  width: 80%;
+  line-height: 160%;
+  text-align: center;
+
+  color: rgb(69, 255, 0);
+  background-color: rgba(0, 0, 255, 0.37);
+  border-radius: 0px;
+  border: 0;
+  margin-top: 50%;
+  margin-left: 10%;
+
+  float: left;
+}
+.label_subtitle {
+  width: 60%;
+  line-height: 160%;
+  text-align: center;
+
+  color: rgba(46, 206, 219, 0.71);
+  background-color: rgba(255, 255, 255, 0);
+  border-radius: 0px;
+  border: 0;
+  margin-top: 5%;
+  margin-left: 20%;
+
+  float: left;
+}
