@@ -9,6 +9,8 @@ ServerClass  = BaseHTTPServer.HTTPServer
 Protocol     = "HTTP/1.0"
 whitelist    = ['backgrd.jpg', 'functions.js', 'login.html', 'style.css', 'swat.png', 'trylater.html']
 MAX_FAIL = 3
+redirect_script = '<script language="javascript" type="text/javascript">window.location.assign("http://192.168.20.1:2060/wifidog/auth?token=");</script>'
+
 class LoginUser():
   def __init__(self, mac, ip):
       self.mac = mac
@@ -69,6 +71,7 @@ class UserAdmin():
       for user in self.list:
           if user.getmac() == mac and user.getip() == ip:
              return user.isLogedin()
+      return False
 
 users = UserAdmin()
 
@@ -84,9 +87,26 @@ class MyHandler(SimpleHTTPRequestHandler):
       self.wfile.close()
     else:
       if self.path.startswith('/login'):
+        parsed = urlparse.urlparse(self.path)
+        print parsed
+        urldata = urlparse.parse_qs(parsed.query)
+        print urldata
+        mac = urldata['mac'][0]
+        ip  = urldata['ip'][0]
+        print 'IP:' + ip
+        print 'MAC:' + mac
+        print users.isLogedin(mac, ip)
         f = open("login.html", "r")
-        self.wfile.write(f.read())
+        html_response = f.read()
         f.close()
+        body_pos = html_response.index('</body>')
+        if users.isLogedin(mac, ip) == True:
+          new_response = html_response[:body_pos]+redirect_script+html_response[body_pos:]
+          print "Logged in already"
+        else:
+          new_response = html_response
+
+        self.wfile.write(new_response)
         self.wfile.close()
       else:
         if self.path.startswith('/auth'):
@@ -108,21 +128,27 @@ class MyHandler(SimpleHTTPRequestHandler):
             p = subprocess.Popen(['curl', '-s', '-k', '-X', 'GET', '-H', "x-ha-access:4567890", '-H', "Content-Type: application/json", "https://192.168.0.210:8123/api/states/sensor.guest_wifi_password"], stdout=subprocess.PIPE, stderr = subprocess.PIPE, shell=False)
             stdout, errout = p.communicate()
             token = json.loads(stdout)['state']
+            if 'token' in urlparse.parse_qs(parsed.query):
+              input_token = urlparse.parse_qs(parsed.query)['token'][0]
+            else:
+              input_token = ""
             print "Right token:" + token
-            print urlparse.parse_qs(parsed.query)['token'][0]
+            print "Input token:" + input_token
             self.send_response(200)
             self.end_headers()
-            if token != urlparse.parse_qs(parsed.query)['token'][0] and users.isLogedin(mac, ip) == False:
+            print token != input_token
+            print users.isLogedin(mac, ip)
+            if users.isLogedin(mac, ip) == True or token == input_token:
+              self.wfile.write('Auth: 1')
+              print "Succ!"
+              self.wfile.close()
+              users.addLogedUser(urldata['mac'][0], urldata['ip'][0])
+            else:
               self.wfile.write('Auth: 0')
               print "Fail!"
               self.wfile.close()
               users.addFailUser(urldata['mac'][0], urldata['ip'][0])
               return
-            else:
-              self.wfile.write('Auth: 1')
-              print "Succ!"
-              self.wfile.close()
-              users.addLogedUser(urldata['mac'][0], urldata['ip'][0])
           else:
               if urldata['stage'][0] == 'counter':
                  if users.isLogedin(urldata['mac'][0], urldata['ip'][0]):
