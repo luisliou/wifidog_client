@@ -125,7 +125,7 @@ class MyHandler(SimpleHTTPRequestHandler):
              self.wfile.close()
              return
           if urldata['stage'][0] == 'login':
-            p = subprocess.Popen(['curl', '-s', '-k', '-X', 'GET', '-H', "x-ha-access:4567890", '-H', "Content-Type: application/json", "https://192.168.0.210:8123/api/states/sensor.guest_wifi_password"], stdout=subprocess.PIPE, stderr = subprocess.PIPE, shell=False)
+            p = subprocess.Popen(['curl', '-s', '-k', '-X', 'GET', '-H', "Content-Type: application/json", "https://192.168.0.210:8123/api/states/sensor.guest_wifi_password"], stdout=subprocess.PIPE, stderr = subprocess.PIPE, shell=False)
             stdout, errout = p.communicate()
             token = json.loads(stdout)['state']
             if 'token' in urlparse.parse_qs(parsed.query):
