@@ -1,6 +1,8 @@
 import sys
 import time
 import json
+import urllib
+import io, shutil
 import subprocess
 import urlparse
 import BaseHTTPServer
@@ -76,6 +78,22 @@ class UserAdmin():
 users = UserAdmin()
 
 class MyHandler(SimpleHTTPRequestHandler):
+  def do_POST(self):
+    print(self.headers)
+    datas = self.rfile.read (int (self.headers['content-length']))
+    datas = urllib.unquote (datas).decode ("utf-8", 'ignore')
+    self.do_auth(datas)
+  def do_auth(self, content):
+    enc = "UTF-8"
+    auth_script = redirect_script.replace("token=", content)
+    print(auth_script)
+    content = auth_script.encode(enc)
+    self.send_response(200)  
+    self.send_header("Content-type", "text/html; charset=%s" % enc)  
+    self.send_header("Content-Length", str(len(content)))  
+    self.end_headers()  
+    self.wfile.write(content)
+
   def do_GET(self):
     global users
     print self.path
@@ -125,8 +143,13 @@ class MyHandler(SimpleHTTPRequestHandler):
              self.wfile.close()
              return
           if urldata['stage'][0] == 'login':
-            p = subprocess.Popen(['curl', '-s', '-k', '-X', 'GET', '-H', "Content-Type: application/json", "https://192.168.0.210:8123/api/states/sensor.guest_wifi_password"], stdout=subprocess.PIPE, stderr = subprocess.PIPE, shell=False)
+            global ha_token
+            print("Global token:" + ha_token)
+            p = subprocess.Popen(['curl', '-s', '-k', '-X', 'GET', '-H', 'Authorization: Bearer ' + ha_token, '-H', "Content-Type: application/json", "https://192.168.0.210:8123/api/states/sensor.guest_wifi_password"], stdout=subprocess.PIPE, stderr = subprocess.PIPE, shell=False)
             stdout, errout = p.communicate()
+            time.sleep(1)
+            print(stdout)
+            print(json.loads(stdout))
             token = json.loads(stdout)['state']
             if 'token' in urlparse.parse_qs(parsed.query):
               input_token = urlparse.parse_qs(parsed.query)['token'][0]
@@ -177,10 +200,12 @@ class MyHandler(SimpleHTTPRequestHandler):
                  else:
                    print "error"
  
+port = 80
 if sys.argv[1:]:
     port = int(sys.argv[1])
-else:
-    port = 80
+    ha_token = sys.argv[2]
+    print(ha_token)
+
 server_address = ('0.0.0.0', port)
  
 MyHandler.protocol_version = Protocol

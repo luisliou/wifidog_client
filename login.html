@@ -14,16 +14,18 @@
  
     <p id="image_logo"><img src="/swat.png"></p>
  
-    <!--form method="post" action="/functions.js"-->
+    <form method="post" action="/functions.js">
     <div id="myform">
  
-        <p><label class="label_input">验证码</label><input type="text" maxlength="8" id="token" class="text_field"/></p>
+        <p><label class="label_input">验证码</label><input type="text" maxlength="8" name="token" class="text_field"/></p>
  
-        <!-- div id="login_control" -->
-            <button id="btn_login"  onclick="login();">登录</button>
+        <!--div id="login_control" -->
+    <!--button type="button" id="btn_login" onclick="javascript:alert('kfa')">登录</button-->
             <!--a id="forget_pwd" href="forget_pwd.html">如何获得验证码？</a-->
         <!--/div-->
     </div>
+    <input type="submit" value="Submit">
+    </form>
 </div>
 
 </body>
